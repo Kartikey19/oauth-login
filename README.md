@@ -4,7 +4,8 @@
 In the requirement it is expected that user email will be always available from social login. But that is not the case. In website/home.go data is not being saved after successfull github login since it will throw and error. 
 I have hard coded the postgres connection variables for now to run tests and load data with some initial users.
 If you want to save data on runtime uncomment line 43,44 in website/home.go.
-RUN make test before running go run main.go
+Step:1 --->RUN make test 
+Step:2 --->RUN go run main.go
 
 ### Prerequisites
 
