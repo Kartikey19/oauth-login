@@ -7,6 +7,8 @@ import (
 	gocialite "gopkg.in/danilopolani/gocialite.v1"
 )
 
+// Was trying to build my own Handler for callback
+// Used gologin instead
 var gocial = gocialite.NewDispatcher()
 
 // Redirect to correct oAuth URL

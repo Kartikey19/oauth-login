@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Go To-Do list</title>
+  </head>
+  <body>
+    <p>
+      All Users:
+    </p>
+    <table>
+      	<tr>
+          <td>ID</td>
+          <td>Name</td>
+          <td>Phone</td>
+          <td>Email</td>
+    	</tr>
+      	{{ with .Users }}
+			{{ range . }}
+      			<tr>
+                    <td><a href="/user/{{ .ID }}">{{ .ID }}</a></td>
+              		<td>{{ .Name }}</td>
+                    <td>{{ .Phone }}</td>
+                    <td>{{ .Email }}</td>
+      			</tr>
+			{{ end }} 
+      	{{ end }}
+    </table>
+  </body>
+</html>

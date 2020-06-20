@@ -23,7 +23,7 @@ testr:
 test:
 	while IFS= read -r tbl; do `echo tbl` ; done < .env
 	echo "Added .env file environments variable to system."
-	go test . ./postgres -cover
+	go test . ./postgres -cover -v
 
 run:	test
 	go run *.go

@@ -6,7 +6,7 @@ import (
 
 // Env : Wrapper to hold all resources
 type Env struct {
-	Db      *postgres.DB
+	DB      *postgres.DB
 	Verbose string
 	Config  *Config
 }

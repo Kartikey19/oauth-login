@@ -12,6 +12,8 @@ import (
 	"github.com/caarlos0/env"
 	"github.com/go-chi/chi"
 	"github.com/joho/godotenv"
+	"golang.org/x/oauth2"
+	githubOAuth2 "golang.org/x/oauth2/github"
 )
 
 var (
@@ -61,8 +63,15 @@ func loadConfig() *config.Config {
 
 func getRoutes(env *config.Env) *chi.Mux {
 	r := chi.NewRouter()
+	oauth2GithubConfig := &oauth2.Config{
+		ClientID:     env.Config.GithubClientID,
+		ClientSecret: env.Config.GithubClientSecret,
+		RedirectURL:  "http://localhost:8080/github/callback",
+		Endpoint:     githubOAuth2.Endpoint,
+	}
 	web := &website.Website{
-		Env: env,
+		Env:          env,
+		GithubConfig: oauth2GithubConfig,
 	}
 	r.Route("/", func(r chi.Router) {
 		r.Mount("/", web.GetRouter())
@@ -73,7 +82,7 @@ func getRoutes(env *config.Env) *chi.Mux {
 func main() {
 	env := &config.Env{}
 	env.Config = cfg
-	env.Db = db
+	env.DB = db
 	router := getRoutes(env)
 	fmt.Println("hail hydra")
 	http.ListenAndServe(":8080", router)
