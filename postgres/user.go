@@ -24,13 +24,21 @@ func (j *JSONB) Scan(value interface{}) error {
 	return nil
 }
 
+// CREATE INDEX index_users_on_name ON users USING gin(to_tsvector('simple', name));
+
 // User represents app user
 type User struct {
 	ID    int64  `gorm:"primary_key" json:"id"`
-	Name  string `gorm:"not null" json:"name"`
+	Name  string `gorm:"not null type:tsvector" json:"name"`
 	Email string `gorm:"unique" json:"email"`
 	Phone string `gorm:"index" json:"phone"`
 	Meta  JSONB  `sql:"type:jsonb" json:"-"`
+}
+
+// SearchUser object will returned when searching users
+type SearchUser struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 // CheckValidSource checks if the source is valid
@@ -80,4 +88,11 @@ func (db *DB) GetUserByID(id int64) *User {
 	var user User
 	db.Where(&User{ID: id}).First(&user)
 	return &user
+}
+
+// SearchUserByName searches users by name
+func (db *DB) SearchUserByName(term string) ([]SearchUser, error) {
+	var results []SearchUser
+	err := db.Table("users").Where("name @@ to_tsquery(?)", term).Find(&results).Error
+	return results, err
 }

@@ -38,6 +38,7 @@ func (web *Website) registerRoutes() {
 	web.Router.Route("/user", func(r chi.Router) {
 		r.Use(requireLogin) // middleware layer
 		r.Get("/all", web.fetchAllUsers)
+		r.Get("/search", web.searchUser)
 		r.Get("/{id:[1-9]+}", web.fetchUser)
 	})
 

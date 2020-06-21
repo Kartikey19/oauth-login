@@ -45,8 +45,15 @@ func TestUserCreation(t *testing.T) {
 		Source: "github",
 		Other:  "oos",
 	}
+	u4 := &TestUser{
+		Name:   "samarth",
+		Email:  "samarth@gmail.com",
+		Phone:  "8283948459",
+		Source: "github",
+		Other:  "oos",
+	}
 
-	testData.Users = []*TestUser{u1, u2, u3}
+	testData.Users = []*TestUser{u1, u2, u3, u4}
 	for _, user := range testData.Users {
 		// check if email already exists
 		dbUser := postgresDb.CheckUserExists(user.Email)
@@ -110,14 +117,7 @@ func TestAllUsersFetching(t *testing.T) {
 	}
 	defer gormDB.Close()
 	defer db.Close()
-	mockDB := &DB{gormDB}
 	mock.ExpectBegin()
-	mock.ExpectQuery(`SELECT * from "users"`)
-
-	// we make sure that all expectations were met
-	mockDB.GetAllUsers()
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	mock.ExpectExec(`SELECT * from "users"`)
 
 }

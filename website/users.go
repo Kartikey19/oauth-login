@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"recro_demo/jsonwrap"
 	"recro_demo/postgres"
 	"strconv"
 
@@ -40,4 +41,18 @@ func (web *Website) fetchUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprint(w, `<p>There is some problem fetching all Users!</p>`)
 	}
+}
+
+func (web *Website) searchUser(w http.ResponseWriter, r *http.Request) {
+	jsonResp := make(map[string]interface{})
+	query := r.URL.Query().Get("q")
+	users, err := web.Env.DB.SearchUserByName(query + ":*")
+	if err != nil {
+		resp, _ := jsonwrap.MakeJSONResponse(fmt.Sprintf("Error in searching users %s.", query), jsonResp, false)
+		jsonwrap.SendJSONHttpResponse(w, resp, http.StatusInternalServerError)
+		return
+	}
+	jsonResp["users"] = users
+	resp, _ := jsonwrap.MakeJSONResponse(fmt.Sprintf("Successfully fetched users"), jsonResp, true)
+	jsonwrap.SendJSONHttpResponse(w, resp, http.StatusOK)
 }
