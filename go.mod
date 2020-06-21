@@ -3,6 +3,7 @@ module recro_demo
 go 1.13
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.4.1
 	github.com/aws/aws-sdk-go v1.32.3 // indirect
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/danilopolani/gocialite v1.0.2 // indirect

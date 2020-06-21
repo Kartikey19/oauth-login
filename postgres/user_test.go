@@ -3,7 +3,9 @@ package postgres
 import (
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/fatih/structs"
+	"github.com/jinzhu/gorm"
 )
 
 type TestUser struct {
@@ -47,7 +49,7 @@ func TestUserCreation(t *testing.T) {
 	testData.Users = []*TestUser{u1, u2, u3}
 	for _, user := range testData.Users {
 		// check if email already exists
-		dbUser := db.CheckUserExists(user.Email)
+		dbUser := postgresDb.CheckUserExists(user.Email)
 		if dbUser.ID == 0 {
 			// create new user
 			createNewUser(user, t)
@@ -73,7 +75,7 @@ func createNewUser(user *TestUser, t *testing.T) {
 	metaMap[user.Source] = user
 
 	dbUser.Meta = metaMap
-	id := db.CreateUser(dbUser)
+	id := postgresDb.CreateUser(dbUser)
 	if id == -1 {
 		t.Error("New User: Valid user not created")
 	}
@@ -87,11 +89,35 @@ func updateUser(user *TestUser, t *testing.T, dbUser *User) {
 	}
 	if _, ok := jsonData[user.Source]; !ok {
 		jsonData[user.Source] = structs.Map(&user)
-		err := db.UpdateUserMeta(dbUser.ID, jsonData)
+		err := postgresDb.UpdateUserMeta(dbUser.ID, jsonData)
 		if err != nil {
 			t.Error("Repeated User:Meta not updated")
 			return
 		}
+	}
+
+}
+
+func TestAllUsersFetching(t *testing.T) {
+	db, mock, errMockLoad := sqlmock.New()
+	if errMockLoad != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", errMockLoad)
+	}
+
+	gormDB, errDbLoad = gorm.Open("postgres", db)
+	if errDbLoad != nil {
+		t.Errorf("Database not created for testing.")
+	}
+	defer gormDB.Close()
+	defer db.Close()
+	mockDB := &DB{gormDB}
+	mock.ExpectBegin()
+	mock.ExpectQuery(`SELECT * from "users"`)
+
+	// we make sure that all expectations were met
+	mockDB.GetAllUsers()
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 
 }
