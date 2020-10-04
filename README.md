@@ -1,4 +1,4 @@
-# RECRO DEMO PROJECT
+# OAUTH LOGIN GO DEMO
 
 ## Getting Started 
 In the requirement it is expected that user email will be always available from social login. But that is not the case. In website/home.go data is not being saved after successfull github login since it will throw and error. 
